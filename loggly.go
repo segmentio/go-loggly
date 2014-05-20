@@ -23,7 +23,7 @@ const Version = "0.0.1"
 // Default API end-point
 //
 
-const api = "http://logs-01.loggly.com/bulk/{token}/tag/bulk"
+const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
 
 //
 // Message type
