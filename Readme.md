@@ -14,11 +14,11 @@ package main
 import "github.com/segmentio/loggly-go"
 
 func main() {
-  client := loggly.New("8bad16f2-6c0e-4d90-944e-51238379f8d47")
+  log := loggly.New("8bad16f2-6c0e-4d90-944e-51238379f8d47")
 
-  client.Error("boom")
+  log.Error("boom")
 
-  client.Info("connecting", loggly.Message{
+  log.Info("connecting", loggly.Message{
     "some": "details",
     "here": 123,
   }})
