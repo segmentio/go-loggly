@@ -110,7 +110,7 @@ func New(token string) (c *Client) {
 // Buffer a log message.
 //
 
-func (c *Client) Log(msg Message) error {
+func (c *Client) Send(msg Message) error {
 	msg["timestamp"] = int32(time.Now().Unix())
 	merge(msg, c.Defaults)
 
@@ -141,7 +141,7 @@ func (c *Client) Debug(t string, props ...Message) error {
 	}
 	msg := Message{"level": "debug", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -154,7 +154,7 @@ func (c *Client) Info(t string, props ...Message) error {
 	}
 	msg := Message{"level": "info", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -167,7 +167,7 @@ func (c *Client) Notice(t string, props ...Message) error {
 	}
 	msg := Message{"level": "notice", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -180,7 +180,7 @@ func (c *Client) Warn(t string, props ...Message) error {
 	}
 	msg := Message{"level": "warning", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -193,7 +193,7 @@ func (c *Client) Error(t string, props ...Message) error {
 	}
 	msg := Message{"level": "error", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -206,7 +206,7 @@ func (c *Client) Critical(t string, props ...Message) error {
 	}
 	msg := Message{"level": "critical", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -219,7 +219,7 @@ func (c *Client) Alert(t string, props ...Message) error {
 	}
 	msg := Message{"level": "alert", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //
@@ -232,7 +232,7 @@ func (c *Client) Emergency(t string, props ...Message) error {
 	}
 	msg := Message{"level": "emergency", "type": t}
 	merge(msg, props...)
-	return c.Log(msg)
+	return c.Send(msg)
 }
 
 //

@@ -16,6 +16,11 @@ import "github.com/segmentio/loggly-go"
 func main() {
   log := loggly.New("8bad16f2-6c0e-4d90-944e-51238379f8d47")
 
+  log.Send(loggly.Message{
+    "whatever": "you want",
+    "here": "whoop",
+  })
+
   log.Error("boom")
 
   log.Info("connecting", loggly.Message{
@@ -40,7 +45,7 @@ func main() {
 ## Levels
 
  Syslog level methods are provided, as well
- as a base `.Log()` call.
+ as a base `.Send()` call.
 
 ## License
 
