@@ -111,7 +111,7 @@ func New(token string) (c *Client) {
 //
 
 func (c *Client) Log(msg Message) error {
-	msg["timestamp"] = time.Now()
+	msg["timestamp"] = int32(time.Now().Unix())
 	merge(msg, c.Defaults)
 
 	json, err := Marshal(msg)
