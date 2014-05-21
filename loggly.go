@@ -10,6 +10,7 @@ import "net/http"
 import "strings"
 import "bytes"
 import "time"
+import "sync"
 import "log"
 import "os"
 
@@ -67,6 +68,8 @@ type Client struct {
 	Token         string
 	buffer        [][]byte
 	Defaults      Message
+	bufferMutex   sync.Mutex
+	flushMutex    sync.Mutex
 }
 
 //
@@ -111,6 +114,9 @@ func New(token string) (c *Client) {
 //
 
 func (c *Client) Send(msg Message) error {
+	c.bufferMutex.Lock()
+	defer c.bufferMutex.Unlock()
+
 	msg["timestamp"] = int32(time.Now().Unix())
 	merge(msg, c.Defaults)
 
@@ -262,6 +268,9 @@ func merge(a Message, others ...Message) {
 //
 
 func (c *Client) flush() error {
+	c.flushMutex.Lock()
+	defer c.flushMutex.Unlock()
+
 	if len(c.buffer) == 0 {
 		c.log("no messages to flush")
 		return nil
