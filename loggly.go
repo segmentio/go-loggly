@@ -18,7 +18,7 @@ import "os"
 // Library version
 //
 
-const Version = "0.0.2"
+const Version = "0.0.5"
 
 //
 // Default API end-point
