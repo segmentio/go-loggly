@@ -2,7 +2,7 @@
 0.1.0 / 2014-05-22
 ==================
 
-
+ * replace Debugging option with debug package
 
 0.0.5 / 2014-05-20
 ==================
