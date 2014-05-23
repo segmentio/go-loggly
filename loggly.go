@@ -4,6 +4,7 @@ package loggly
 // dependencies
 //
 
+import d "github.com/visionmedia/go-debug"
 import . "encoding/json"
 import "io/ioutil"
 import "net/http"
@@ -31,6 +32,12 @@ const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
 //
 
 type Message map[string]interface{}
+
+//
+// Debug.
+//
+
+var debug d.DebugFunction = d.Debug("loggly")
 
 //
 // Newline delim
@@ -61,7 +68,6 @@ const (
 
 type Client struct {
 	Level         Level
-	Debugging     bool
 	BufferSize    int
 	FlushInterval time.Duration
 	Endpoint      string
@@ -91,7 +97,7 @@ func New(token string) (c *Client) {
 		go func() {
 			for {
 				time.Sleep(c.FlushInterval)
-				c.log("interval %v reached", c.FlushInterval)
+				debug("interval %v reached", c.FlushInterval)
 				go c.flush()
 			}
 		}()
@@ -99,7 +105,6 @@ func New(token string) (c *Client) {
 
 	return &Client{
 		Level:         Info,
-		Debugging:     false,
 		BufferSize:    100,
 		FlushInterval: 5 * time.Second,
 		Token:         token,
@@ -128,7 +133,7 @@ func (c *Client) Send(msg Message) error {
 
 	c.buffer = append(c.buffer, json)
 
-	c.log("buffer (%d/%d) %v", len(c.buffer), c.BufferSize, msg)
+	debug("buffer (%d/%d) %v", len(c.buffer), c.BufferSize, msg)
 
 	if len(c.buffer) >= c.BufferSize {
 		go c.flush()
@@ -242,16 +247,6 @@ func (c *Client) Emergency(t string, props ...Message) error {
 }
 
 //
-// Log in debug mode.
-//
-
-func (c *Client) log(format string, v ...interface{}) {
-	if c.Debugging {
-		log.Printf(format, v...)
-	}
-}
-
-//
 // Merge others into a.
 //
 
@@ -272,21 +267,21 @@ func (c *Client) flush() error {
 	defer c.flushMutex.Unlock()
 
 	if len(c.buffer) == 0 {
-		c.log("no messages to flush")
+		debug("no messages to flush")
 		return nil
 	}
 
-	c.log("flushing %d messages", len(c.buffer))
+	debug("flushing %d messages", len(c.buffer))
 	body := bytes.Join(c.buffer, nl)
 
 	c.buffer = nil
 
 	client := &http.Client{}
-	c.log("POST %s with %d bytes", c.Endpoint, len(body))
+	debug("POST %s with %d bytes", c.Endpoint, len(body))
 	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(body))
 
 	if err != nil {
-		c.log("error: %v", err)
+		debug("error: %v", err)
 		return err
 	}
 
@@ -297,15 +292,15 @@ func (c *Client) flush() error {
 	res, err := client.Do(req)
 
 	if err != nil {
-		c.log("error: %v", err)
+		debug("error: %v", err)
 		return err
 	}
 
-	c.log("%d response", res.StatusCode)
+	debug("%d response", res.StatusCode)
 
 	if res.StatusCode >= 400 {
 		resp, _ := ioutil.ReadAll(res.Body)
-		c.log("error: %s", string(resp))
+		debug("error: %s", string(resp))
 	}
 
 	return err
