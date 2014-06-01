@@ -1,17 +1,17 @@
-# loggly-go
+# go-loggly
 
   Loggly client for Go.
 
 ## Installation
 
-    $ go get github.com/segmentio/loggly-go
+    $ go get github.com/segmentio/go-loggly
 
 ## Example
 
 ```go
 package main
 
-import "github.com/segmentio/loggly-go"
+import "github.com/segmentio/go-loggly"
 
 func main() {
   log := loggly.New("8bad16f2-6c0e-4d90-944e-51238379f8d47")
