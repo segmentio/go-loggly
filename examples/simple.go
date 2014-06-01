@@ -5,6 +5,7 @@ import "time"
 
 func main() {
 	client := loggly.New("8bad16f2-6c0e-4d90-944e-5668779f8d47")
+	client.Stdout = true
 
 	for {
 		client.Info("connecting")

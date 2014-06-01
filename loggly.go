@@ -67,6 +67,7 @@ const (
 //
 
 type Client struct {
+	Stdout        bool
 	Level         Level
 	BufferSize    int
 	FlushInterval time.Duration
@@ -103,6 +104,7 @@ func New(token string) (c *Client) {
 	}()
 
 	return &Client{
+		Stdout:        false,
 		Level:         Info,
 		BufferSize:    100,
 		FlushInterval: 5 * time.Second,
@@ -128,6 +130,10 @@ func (c *Client) Send(msg Message) error {
 
 	if err != nil {
 		return err
+	}
+
+	if c.Stdout {
+		log.Printf("%s\n", string(json))
 	}
 
 	c.buffer = append(c.buffer, json)
