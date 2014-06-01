@@ -123,7 +123,7 @@ func (c *Client) Send(msg Message) error {
 	c.Lock()
 	defer c.Unlock()
 
-	msg["timestamp"] = int32(time.Now().Unix())
+	msg["timestamp"] = time.Now().UnixNano() / int64(time.Millisecond)
 	merge(msg, c.Defaults)
 
 	json, err := Marshal(msg)
