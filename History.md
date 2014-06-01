@@ -1,4 +1,12 @@
 
+0.2.0 / 2014-05-31
+==================
+
+ * add .Stdout option
+ * add simple example
+ * fix locking typo
+ * refactor locking
+
 0.1.0 / 2014-05-22
 ==================
 
