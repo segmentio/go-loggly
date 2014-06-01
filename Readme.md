@@ -40,6 +40,7 @@ func main() {
  - `.Endpoint` (string) loggly api url
  - `.Defaults` (loggly.Message) default properties
  - `.Level` (loggly.Level) log level [loggly.Info]
+ - `.Stdout` (bool) output json logs to stdout [false]
 
 ## Levels
 
