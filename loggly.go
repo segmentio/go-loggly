@@ -266,7 +266,7 @@ func (c *Client) flush() error {
 
 	if len(c.buffer) == 0 {
 		debug("no messages to flush")
-		defer c.Unlock()
+		c.Unlock()
 		return nil
 	}
 
@@ -274,7 +274,7 @@ func (c *Client) flush() error {
 	body := bytes.Join(c.buffer, nl)
 
 	c.buffer = nil
-	defer c.Unlock()
+	c.Unlock()
 
 	client := &http.Client{}
 	debug("POST %s with %d bytes", c.Endpoint, len(body))
