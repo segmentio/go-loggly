@@ -1,6 +1,6 @@
 package main
 
-import "github.com/segmentio/loggly-go"
+import "github.com/segmentio/go-loggly"
 import "time"
 
 func main() {
