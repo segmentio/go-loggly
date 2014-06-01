@@ -37,7 +37,7 @@ type Message map[string]interface{}
 // Debug.
 //
 
-var debug d.DebugFunction = d.Debug("loggly")
+var debug = d.Debug("loggly")
 
 //
 // Newline delim
@@ -74,8 +74,7 @@ type Client struct {
 	Token         string
 	buffer        [][]byte
 	Defaults      Message
-	bufferMutex   sync.Mutex
-	flushMutex    sync.Mutex
+	sync.Mutex
 }
 
 //
@@ -119,8 +118,8 @@ func New(token string) (c *Client) {
 //
 
 func (c *Client) Send(msg Message) error {
-	c.bufferMutex.Lock()
-	defer c.bufferMutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	msg["timestamp"] = int32(time.Now().Unix())
 	merge(msg, c.Defaults)
@@ -263,11 +262,11 @@ func merge(a Message, others ...Message) {
 //
 
 func (c *Client) flush() error {
-	c.flushMutex.Lock()
-	defer c.flushMutex.Unlock()
+	c.Lock()
 
 	if len(c.buffer) == 0 {
 		debug("no messages to flush")
+		defer c.Unlock()
 		return nil
 	}
 
@@ -275,6 +274,7 @@ func (c *Client) flush() error {
 	body := bytes.Join(c.buffer, nl)
 
 	c.buffer = nil
+	defer c.Unlock()
 
 	client := &http.Client{}
 	debug("POST %s with %d bytes", c.Endpoint, len(body))
