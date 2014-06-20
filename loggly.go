@@ -296,12 +296,12 @@ func (c *Client) flush() error {
 	req.Header.Add("Content-Length", string(len(body)))
 
 	res, err := client.Do(req)
-	defer res.Body.Close()
 
 	if err != nil {
 		debug("error: %v", err)
 		return err
 	}
+	defer res.Body.Close()
 
 	debug("%d response", res.StatusCode)
 
