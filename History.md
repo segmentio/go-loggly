@@ -1,4 +1,9 @@
 
+0.1.1 / 2014-07-10
+==================
+
+ * fix: close the response body so it doesn't leak file descriptors
+
 0.3.0 / 2014-06-01
 ==================
 

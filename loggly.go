@@ -15,7 +15,7 @@ import "sync"
 import "log"
 import "os"
 
-const Version = "0.1.0"
+const Version = "0.1.1"
 
 const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
 
