@@ -301,6 +301,7 @@ func (c *Client) flush() error {
 		debug("error: %v", err)
 		return err
 	}
+	defer res.Body.Close()
 
 	debug("%d response", res.StatusCode)
 
