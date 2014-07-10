@@ -15,39 +15,15 @@ import "sync"
 import "log"
 import "os"
 
-//
-// Library version
-//
-
 const Version = "0.1.0"
-
-//
-// Default API end-point
-//
 
 const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
 
-//
-// Message type
-//
-
 type Message map[string]interface{}
-
-//
-// Debug.
-//
 
 var debug = d.Debug("loggly")
 
-//
-// Newline delim
-//
-
 var nl = []byte{'\n'}
-
-//
-// Log levels
-//
 
 type Level int
 
@@ -62,10 +38,7 @@ const (
 	Emergency
 )
 
-//
-// Loggly client
-//
-
+// Loggly client.
 type Client struct {
 	Stdout        bool
 	Level         Level
@@ -78,10 +51,7 @@ type Client struct {
 	sync.Mutex
 }
 
-//
 // Return a new Loggly client with the given token.
-//
-
 func New(token string) (c *Client) {
 	host, err := os.Hostname()
 
@@ -115,10 +85,7 @@ func New(token string) (c *Client) {
 	}
 }
 
-//
 // Buffer a log message.
-//
-
 func (c *Client) Send(msg Message) error {
 	c.Lock()
 	defer c.Unlock()
@@ -127,7 +94,6 @@ func (c *Client) Send(msg Message) error {
 	merge(msg, c.Defaults)
 
 	json, err := Marshal(msg)
-
 	if err != nil {
 		return err
 	}
@@ -147,10 +113,7 @@ func (c *Client) Send(msg Message) error {
 	return nil
 }
 
-//
 // Debug log.
-//
-
 func (c *Client) Debug(t string, props ...Message) error {
 	if c.Level > Debug {
 		return nil
@@ -160,10 +123,7 @@ func (c *Client) Debug(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Info log.
-//
-
 func (c *Client) Info(t string, props ...Message) error {
 	if c.Level > Info {
 		return nil
@@ -173,10 +133,7 @@ func (c *Client) Info(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Notice log.
-//
-
 func (c *Client) Notice(t string, props ...Message) error {
 	if c.Level > Notice {
 		return nil
@@ -186,10 +143,7 @@ func (c *Client) Notice(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Warning log.
-//
-
 func (c *Client) Warn(t string, props ...Message) error {
 	if c.Level > Warning {
 		return nil
@@ -199,10 +153,7 @@ func (c *Client) Warn(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Error log.
-//
-
 func (c *Client) Error(t string, props ...Message) error {
 	if c.Level > Error {
 		return nil
@@ -212,10 +163,7 @@ func (c *Client) Error(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Critical log.
-//
-
 func (c *Client) Critical(t string, props ...Message) error {
 	if c.Level > Critical {
 		return nil
@@ -225,10 +173,7 @@ func (c *Client) Critical(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Alert log.
-//
-
 func (c *Client) Alert(t string, props ...Message) error {
 	if c.Level > Alert {
 		return nil
@@ -238,10 +183,7 @@ func (c *Client) Alert(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Emergency log.
-//
-
 func (c *Client) Emergency(t string, props ...Message) error {
 	if c.Level > Emergency {
 		return nil
@@ -251,10 +193,7 @@ func (c *Client) Emergency(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-//
 // Merge others into a.
-//
-
 func merge(a Message, others ...Message) {
 	for _, msg := range others {
 		for k, v := range msg {
@@ -263,10 +202,7 @@ func merge(a Message, others ...Message) {
 	}
 }
 
-//
 // Flush the buffered messages.
-//
-
 func (c *Client) flush() error {
 	c.Lock()
 
@@ -285,7 +221,6 @@ func (c *Client) flush() error {
 	client := &http.Client{}
 	debug("POST %s with %d bytes", c.Endpoint, len(body))
 	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(body))
-
 	if err != nil {
 		debug("error: %v", err)
 		return err
@@ -296,15 +231,13 @@ func (c *Client) flush() error {
 	req.Header.Add("Content-Length", string(len(body)))
 
 	res, err := client.Do(req)
-
+	defer res.Body.Close()
 	if err != nil {
 		debug("error: %v", err)
 		return err
 	}
-	defer res.Body.Close()
 
 	debug("%d response", res.StatusCode)
-
 	if res.StatusCode >= 400 {
 		resp, _ := ioutil.ReadAll(res.Body)
 		debug("error: %s", string(resp))
