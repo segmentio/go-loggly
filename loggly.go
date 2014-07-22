@@ -1,10 +1,6 @@
 package loggly
 
-//
-// dependencies
-//
-
-import d "github.com/visionmedia/go-debug"
+import . "github.com/visionmedia/go-debug"
 import . "encoding/json"
 import "io/ioutil"
 import "net/http"
@@ -12,8 +8,9 @@ import "strings"
 import "bytes"
 import "time"
 import "sync"
-import "log"
+import "fmt"
 import "os"
+import "io"
 
 const Version = "0.1.1"
 
@@ -21,26 +18,27 @@ const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
 
 type Message map[string]interface{}
 
-var debug = d.Debug("loggly")
+var debug = Debug("loggly")
 
 var nl = []byte{'\n'}
 
 type Level int
 
 const (
-	Debug Level = iota
-	Info
-	Notice
-	Warning
-	Error
-	Critical
-	Alert
-	Emergency
+	DEBUG Level = iota
+	INFO
+	NOTICE
+	WARNING
+	ERROR
+	CRITICAL
+	ALERT
+	EMERGENCY
 )
 
 // Loggly client.
 type Client struct {
-	Stdout        bool
+	// Output logs to stderr as well.
+	Writer        io.Writer
 	Level         Level
 	BufferSize    int
 	FlushInterval time.Duration
@@ -54,13 +52,10 @@ type Client struct {
 // Return a new Loggly client with the given token.
 func New(token string) (c *Client) {
 	host, err := os.Hostname()
+	defaults := Message{}
 
-	if err != nil {
-		log.Fatal("failed to get hostname")
-	}
-
-	defaults := Message{
-		"hostname": host,
+	if err == nil {
+		defaults["hostname"] = host
 	}
 
 	defer func() {
@@ -74,8 +69,7 @@ func New(token string) (c *Client) {
 	}()
 
 	return &Client{
-		Stdout:        false,
-		Level:         Info,
+		Level:         INFO,
 		BufferSize:    100,
 		FlushInterval: 5 * time.Second,
 		Token:         token,
@@ -98,8 +92,8 @@ func (c *Client) Send(msg Message) error {
 		return err
 	}
 
-	if c.Stdout {
-		log.Printf("%s\n", string(json))
+	if c.Writer != nil {
+		fmt.Fprintf(c.Writer, "%s\n", string(json))
 	}
 
 	c.buffer = append(c.buffer, json)
@@ -115,7 +109,7 @@ func (c *Client) Send(msg Message) error {
 
 // Debug log.
 func (c *Client) Debug(t string, props ...Message) error {
-	if c.Level > Debug {
+	if c.Level > DEBUG {
 		return nil
 	}
 	msg := Message{"level": "debug", "type": t}
@@ -125,7 +119,7 @@ func (c *Client) Debug(t string, props ...Message) error {
 
 // Info log.
 func (c *Client) Info(t string, props ...Message) error {
-	if c.Level > Info {
+	if c.Level > INFO {
 		return nil
 	}
 	msg := Message{"level": "info", "type": t}
@@ -135,7 +129,7 @@ func (c *Client) Info(t string, props ...Message) error {
 
 // Notice log.
 func (c *Client) Notice(t string, props ...Message) error {
-	if c.Level > Notice {
+	if c.Level > NOTICE {
 		return nil
 	}
 	msg := Message{"level": "notice", "type": t}
@@ -145,7 +139,7 @@ func (c *Client) Notice(t string, props ...Message) error {
 
 // Warning log.
 func (c *Client) Warn(t string, props ...Message) error {
-	if c.Level > Warning {
+	if c.Level > WARNING {
 		return nil
 	}
 	msg := Message{"level": "warning", "type": t}
@@ -155,7 +149,7 @@ func (c *Client) Warn(t string, props ...Message) error {
 
 // Error log.
 func (c *Client) Error(t string, props ...Message) error {
-	if c.Level > Error {
+	if c.Level > ERROR {
 		return nil
 	}
 	msg := Message{"level": "error", "type": t}
@@ -165,7 +159,7 @@ func (c *Client) Error(t string, props ...Message) error {
 
 // Critical log.
 func (c *Client) Critical(t string, props ...Message) error {
-	if c.Level > Critical {
+	if c.Level > CRITICAL {
 		return nil
 	}
 	msg := Message{"level": "critical", "type": t}
@@ -175,7 +169,7 @@ func (c *Client) Critical(t string, props ...Message) error {
 
 // Alert log.
 func (c *Client) Alert(t string, props ...Message) error {
-	if c.Level > Alert {
+	if c.Level > ALERT {
 		return nil
 	}
 	msg := Message{"level": "alert", "type": t}
@@ -185,7 +179,7 @@ func (c *Client) Alert(t string, props ...Message) error {
 
 // Emergency log.
 func (c *Client) Emergency(t string, props ...Message) error {
-	if c.Level > Emergency {
+	if c.Level > EMERGENCY {
 		return nil
 	}
 	msg := Message{"level": "emergency", "type": t}
