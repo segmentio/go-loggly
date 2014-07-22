@@ -62,7 +62,7 @@ type Client struct {
 }
 
 // New returns a new loggly client with the given `token`.
-func New(token string) (c *Client) {
+func New(token string) *Client {
 	host, err := os.Hostname()
 	defaults := Message{}
 
@@ -70,17 +70,7 @@ func New(token string) (c *Client) {
 		defaults["hostname"] = host
 	}
 
-	defer func() {
-		go func() {
-			for {
-				time.Sleep(c.FlushInterval)
-				debug("interval %v reached", c.FlushInterval)
-				go c.Flush()
-			}
-		}()
-	}()
-
-	return &Client{
+	c := &Client{
 		Level:         INFO,
 		BufferSize:    100,
 		FlushInterval: 5 * time.Second,
@@ -89,6 +79,10 @@ func New(token string) (c *Client) {
 		buffer:        make([][]byte, 0),
 		Defaults:      defaults,
 	}
+
+	go c.start()
+
+	return c
 }
 
 // Send buffers `msg` for async sending.
@@ -241,6 +235,15 @@ func (c *Client) Flush() error {
 	}
 
 	return err
+}
+
+// Start flusher.
+func (c *Client) start() {
+	for {
+		time.Sleep(c.FlushInterval)
+		debug("interval %v reached", c.FlushInterval)
+		c.Flush()
+	}
 }
 
 // Merge others into a.
