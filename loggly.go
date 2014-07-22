@@ -113,26 +113,27 @@ func (c *Client) Send(msg Message) error {
 	return nil
 }
 
-// SendString buffers a "raw" string, sent to loggly untouched.
-func (c *Client) SendString(str string) error {
+// Write raw data to loggly.
+func (c *Client) Write(b []byte) (int, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	str += "\n"
+	buf := bytes.NewBuffer(b)
+	buf.WriteByte('\n')
 
 	if c.Writer != nil {
-		fmt.Fprintf(c.Writer, "%s", str)
+		fmt.Fprintf(c.Writer, "%s", buf.Bytes())
 	}
 
-	c.buffer = append(c.buffer, []byte(str))
+	c.buffer = append(c.buffer, buf.Bytes())
 
-	debug("buffer (%d/%d) %q", len(c.buffer), c.BufferSize, str)
+	debug("buffer (%d/%d) %q", len(c.buffer), c.BufferSize, buf.Bytes())
 
 	if len(c.buffer) >= c.BufferSize {
 		go c.Flush()
 	}
 
-	return nil
+	return len(b), nil
 }
 
 // Debug log.

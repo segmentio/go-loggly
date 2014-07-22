@@ -9,7 +9,7 @@ func main() {
 	client.Writer = os.Stderr
 
 	for {
-		client.SendString("testing: some stuff here")
+		client.Write([]byte("testing: some stuff here"))
 		time.Sleep(15 * time.Millisecond)
 	}
 }
