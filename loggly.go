@@ -87,9 +87,6 @@ func New(token string) *Client {
 
 // Send buffers `msg` for async sending.
 func (c *Client) Send(msg Message) error {
-	c.Lock()
-	defer c.Unlock()
-
 	msg["timestamp"] = time.Now().UnixNano() / int64(time.Millisecond)
 	merge(msg, c.Defaults)
 
@@ -98,6 +95,9 @@ func (c *Client) Send(msg Message) error {
 		return err
 	}
 
+	c.Lock()
+	defer c.Unlock()
+
 	if c.Writer != nil {
 		fmt.Fprintf(c.Writer, "%s\n", string(json))
 	}
@@ -105,6 +105,28 @@ func (c *Client) Send(msg Message) error {
 	c.buffer = append(c.buffer, json)
 
 	debug("buffer (%d/%d) %v", len(c.buffer), c.BufferSize, msg)
+
+	if len(c.buffer) >= c.BufferSize {
+		go c.Flush()
+	}
+
+	return nil
+}
+
+// SendString buffers a "raw" string, sent to loggly untouched.
+func (c *Client) SendString(str string) error {
+	c.Lock()
+	defer c.Unlock()
+
+	str += "\n"
+
+	if c.Writer != nil {
+		fmt.Fprintf(c.Writer, "%s", str)
+	}
+
+	c.buffer = append(c.buffer, []byte(str))
+
+	debug("buffer (%d/%d) %q", len(c.buffer), c.BufferSize, str)
 
 	if len(c.buffer) >= c.BufferSize {
 		go c.Flush()
