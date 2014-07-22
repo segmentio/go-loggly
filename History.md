@@ -1,4 +1,12 @@
 
+v0.2.0 / 2014-07-22
+==================
+
+ * add `c.Write()`
+ * add raw example
+ * add public .Flush(). Closes #2
+ * refactor log levels, now capitalized
+
 0.1.1 / 2014-07-10
 ==================
 
