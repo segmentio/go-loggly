@@ -68,7 +68,7 @@ func New(token string) (c *Client) {
 			for {
 				time.Sleep(c.FlushInterval)
 				debug("interval %v reached", c.FlushInterval)
-				go c.flush()
+				go c.Flush()
 			}
 		}()
 	}()
@@ -107,7 +107,7 @@ func (c *Client) Send(msg Message) error {
 	debug("buffer (%d/%d) %v", len(c.buffer), c.BufferSize, msg)
 
 	if len(c.buffer) >= c.BufferSize {
-		go c.flush()
+		go c.Flush()
 	}
 
 	return nil
@@ -203,7 +203,7 @@ func merge(a Message, others ...Message) {
 }
 
 // Flush the buffered messages.
-func (c *Client) flush() error {
+func (c *Client) Flush() error {
 	c.Lock()
 
 	if len(c.buffer) == 0 {
