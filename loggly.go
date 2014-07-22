@@ -37,19 +37,31 @@ const (
 
 // Loggly client.
 type Client struct {
-	// Output logs to stderr as well.
-	Writer        io.Writer
-	Level         Level
-	BufferSize    int
+	// Optionally output logs to the given writer.
+	Writer io.Writer
+
+	// Log level defaulting to INFO.
+	Level Level
+
+	// Size of buffer before flushing [100]
+	BufferSize int
+
+	// Flush interval regardless of size [5s]
 	FlushInterval time.Duration
-	Endpoint      string
-	Token         string
-	buffer        [][]byte
-	Defaults      Message
+
+	// Loggly end-point.
+	Endpoint string
+
+	// Token string.
+	Token string
+
+	// Default properties.
+	Defaults Message
+	buffer   [][]byte
 	sync.Mutex
 }
 
-// Return a new Loggly client with the given token.
+// New returns a new loggly client with the given `token`.
 func New(token string) (c *Client) {
 	host, err := os.Hostname()
 	defaults := Message{}
@@ -79,7 +91,7 @@ func New(token string) (c *Client) {
 	}
 }
 
-// Buffer a log message.
+// Send buffers `msg` for async sending.
 func (c *Client) Send(msg Message) error {
 	c.Lock()
 	defer c.Unlock()
