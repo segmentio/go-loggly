@@ -199,15 +199,6 @@ func (c *Client) Emergency(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
-// Merge others into a.
-func merge(a Message, others ...Message) {
-	for _, msg := range others {
-		for k, v := range msg {
-			a[k] = v
-		}
-	}
-}
-
 // Flush the buffered messages.
 func (c *Client) Flush() error {
 	c.Lock()
@@ -250,4 +241,13 @@ func (c *Client) Flush() error {
 	}
 
 	return err
+}
+
+// Merge others into a.
+func merge(a Message, others ...Message) {
+	for _, msg := range others {
+		for k, v := range msg {
+			a[k] = v
+		}
+	}
 }
