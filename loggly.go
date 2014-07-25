@@ -58,6 +58,7 @@ type Client struct {
 	// Default properties.
 	Defaults Message
 	buffer   [][]byte
+	tags     []string
 	sync.Mutex
 }
 
@@ -243,6 +244,7 @@ func (c *Client) Flush() error {
 	req.Header.Add("User-Agent", "go-loggly (version: "+Version+")")
 	req.Header.Add("Content-Type", "text/plain")
 	req.Header.Add("Content-Length", string(len(body)))
+	req.Header.Add("X-Loggly-Tag", c.tagsList())
 
 	res, err := client.Do(req)
 	defer res.Body.Close()
@@ -258,6 +260,19 @@ func (c *Client) Flush() error {
 	}
 
 	return err
+}
+
+// Tag adds the given tag `name` for all logs.
+func (c *Client) Tag(name string) {
+	c.tags = append(c.tags, name)
+}
+
+// Return a comma-delimited tag list string.
+func (c *Client) tagsList() string {
+	c.Lock()
+	defer c.Unlock()
+
+	return strings.Join(c.tags, ",")
 }
 
 // Start flusher.
