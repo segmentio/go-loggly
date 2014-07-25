@@ -1,4 +1,11 @@
 
+v0.3.0 / 2014-07-25
+==================
+
+ * add io.Writer interface support
+ * add tag support. Closes #5
+ * change User-Agent sent to loggly to match repo
+
 0.1.1 / 2014-07-10
 ==================
 
