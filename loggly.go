@@ -245,6 +245,7 @@ func (c *Client) Flush() error {
 	req.Header.Add("Content-Type", "text/plain")
 	req.Header.Add("Content-Length", string(len(body)))
 	req.Header.Add("X-Loggly-Tag", c.tagsList())
+	println(c.tagsList())
 
 	res, err := client.Do(req)
 	defer res.Body.Close()
@@ -262,9 +263,14 @@ func (c *Client) Flush() error {
 	return err
 }
 
-// Tag adds the given tag `name` for all logs.
-func (c *Client) Tag(name string) {
-	c.tags = append(c.tags, name)
+// Tag adds the given `tags` for all logs.
+func (c *Client) Tag(tags ...string) {
+	c.Lock()
+	defer c.Unlock()
+
+	for _, tag := range tags {
+		c.tags = append(c.tags, tag)
+	}
 }
 
 // Return a comma-delimited tag list string.
