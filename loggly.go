@@ -240,7 +240,7 @@ func (c *Client) Flush() error {
 		return err
 	}
 
-	req.Header.Add("User-Agent", "loggly-go (version: "+Version+")")
+	req.Header.Add("User-Agent", "go-loggly (version: "+Version+")")
 	req.Header.Add("Content-Type", "text/plain")
 	req.Header.Add("Content-Length", string(len(body)))
 
