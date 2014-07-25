@@ -63,7 +63,8 @@ type Client struct {
 }
 
 // New returns a new loggly client with the given `token`.
-func New(token string) *Client {
+// Optionally pass `tags` or set them later with `.Tag()`.
+func New(token string, tags ...string) *Client {
 	host, err := os.Hostname()
 	defaults := Message{}
 
@@ -80,6 +81,8 @@ func New(token string) *Client {
 		buffer:        make([][]byte, 0),
 		Defaults:      defaults,
 	}
+
+	c.Tag(tags...)
 
 	go c.start()
 
@@ -245,7 +248,6 @@ func (c *Client) Flush() error {
 	req.Header.Add("Content-Type", "text/plain")
 	req.Header.Add("Content-Length", string(len(body)))
 	req.Header.Add("X-Loggly-Tag", c.tagsList())
-	println(c.tagsList())
 
 	res, err := client.Do(req)
 	defer res.Body.Close()
