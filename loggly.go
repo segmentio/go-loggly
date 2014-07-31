@@ -122,16 +122,13 @@ func (c *Client) Write(b []byte) (int, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	buf := bytes.NewBuffer(b)
-	buf.WriteByte('\n')
-
 	if c.Writer != nil {
-		fmt.Fprintf(c.Writer, "%s", buf.Bytes())
+		fmt.Fprintf(c.Writer, "%s", b)
 	}
 
-	c.buffer = append(c.buffer, buf.Bytes())
+	c.buffer = append(c.buffer, b)
 
-	debug("buffer (%d/%d) %q", len(c.buffer), c.BufferSize, buf.Bytes())
+	debug("buffer (%d/%d) %q", len(c.buffer), c.BufferSize, b)
 
 	if len(c.buffer) >= c.BufferSize {
 		go c.Flush()
