@@ -247,7 +247,11 @@ func (c *Client) Flush() error {
 	req.Header.Add("User-Agent", "go-loggly (version: "+Version+")")
 	req.Header.Add("Content-Type", "text/plain")
 	req.Header.Add("Content-Length", string(len(body)))
-	req.Header.Add("X-Loggly-Tag", c.tagsList())
+
+	tags := c.tagsList()
+	if tags != "" {
+		req.Header.Add("X-Loggly-Tag", tags)
+	}
 
 	res, err := client.Do(req)
 	defer res.Body.Close()
