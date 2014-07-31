@@ -12,7 +12,7 @@ import "fmt"
 import "os"
 import "io"
 
-const Version = "0.2.0"
+const Version = "0.4.1"
 
 const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
 
