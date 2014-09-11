@@ -14,7 +14,7 @@ import "io"
 
 const Version = "0.4.3"
 
-const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
+const api = "https://logs-01.loggly.com/bulk/{token}"
 
 type Message map[string]interface{}
 
