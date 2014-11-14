@@ -14,7 +14,7 @@ import "io"
 
 const Version = "0.4.3"
 
-const api = "https://logs-01.loggly.com/bulk/{token}/tag/bulk"
+const api = "https://logs-01.loggly.com/bulk/{token}"
 
 type Message map[string]interface{}
 
@@ -91,7 +91,9 @@ func New(token string, tags ...string) *Client {
 
 // Send buffers `msg` for async sending.
 func (c *Client) Send(msg Message) error {
-	msg["timestamp"] = time.Now().UnixNano() / int64(time.Millisecond)
+	if _, exists := msg["timestamp"]; !exists {
+		msg["timestamp"] = time.Now().UnixNano() / int64(time.Millisecond)
+	}
 	merge(msg, c.Defaults)
 
 	json, err := Marshal(msg)
