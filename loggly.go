@@ -92,7 +92,7 @@ func New(token string, tags ...string) *Client {
 // Send buffers `msg` for async sending.
 func (c *Client) Send(msg Message) error {
 	if _, exists := msg["timestamp"]; !exists {
-		msg["timestamp"] = time.Now().UnixNano() / int64(time.Millisecond)
+		msg["timestamp"] = time.Now().UTC().Format(time.RFC3339)
 	}
 	merge(msg, c.Defaults)
 
