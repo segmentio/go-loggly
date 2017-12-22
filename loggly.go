@@ -11,7 +11,7 @@ import "fmt"
 import "os"
 import "io"
 
-const Version = "0.4.3"
+const Version = "0.5.0"
 
 const api = "https://logs-01.loggly.com/bulk/{token}"
 

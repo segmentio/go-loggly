@@ -1,4 +1,13 @@
 
+v0.5.0 / 2017-12-22
+===================
+
+  * remove useless condition
+  * Remove references to vanished debug package (#13)
+  * rename hasTs to exisits
+  * remove /tag/bulk as it is only an example from Loggly doc
+  * only add timestamp if it is not already there
+
 v0.4.3 / 2014-07-31
 ==================
 
