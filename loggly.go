@@ -1,7 +1,7 @@
 package loggly
 
 import . "encoding/json"
-import "io/ioutil"
+
 import "net/http"
 import "strings"
 import "bytes"
@@ -247,10 +247,6 @@ func (c *Client) Flush() error {
 	}
 
 	defer res.Body.Close()
-
-	if res.StatusCode >= 400 {
-		ioutil.ReadAll(res.Body)
-	}
 
 	return err
 }
