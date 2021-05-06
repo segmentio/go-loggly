@@ -52,6 +52,8 @@ type Client struct {
 	// Token string.
 	Token string
 
+	Timeout time.Duration
+
 	// Default properties.
 	Defaults Message
 	buffer   [][]byte
@@ -212,6 +214,11 @@ func (c *Client) Emergency(t string, props ...Message) error {
 	return c.Send(msg)
 }
 
+// SetTimeout for HTTP requests.
+func (c *Client) SetTimeout(timeout time.Duration) {
+	c.Timeout = timeout
+}
+
 // Flush the buffered messages.
 func (c *Client) Flush() error {
 	c.Lock()
@@ -226,7 +233,9 @@ func (c *Client) Flush() error {
 	c.buffer = nil
 	c.Unlock()
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: c.Timeout,
+	}
 	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return err
